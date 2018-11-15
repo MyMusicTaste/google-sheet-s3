@@ -24,9 +24,9 @@ function publish(event) {
   // do nothing if the edited sheet is not the first one
   var sheet = SpreadsheetApp.getActiveSpreadsheet();
   // sheets are indexed from 1 instead of 0
-  if (sheet.getActiveSheet().getIndex() > 1) {
-    return;
-  }
+  //if (sheet.getActiveSheet().getIndex() > 1) {
+    //return;
+  //}
 
   // get cell values from the range that contains data (2D array)
   var rows = sheet
@@ -64,20 +64,20 @@ function publish(event) {
     return obj;
   });
 
-  // upload to S3
+  // upload to S3`
   // https://engetc.com/projects/amazon-s3-api-binding-for-google-apps-script/
   var props = PropertiesService.getDocumentProperties().getProperties();
   var s3 = S3.getInstance(props.awsAccessKeyId, props.awsSecretKey);
-  s3.putObject(props.bucketName, [props.path, sheet.getId()].join('/'), objs);
+  s3.putObject(props.bucketName, [props.path, sheet.getActiveSheet().getName().replace(" ","_")+".json"].join('/'), objs);
 }
 
 // show the configuration modal dialog UI
 function showConfig() {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = SpreadsheetApp.getActiveSheet();
   var ui = SpreadsheetApp.getUi();
   var props = PropertiesService.getDocumentProperties().getProperties();
   var template = HtmlService.createTemplateFromFile('config');
-  template.sheetId = sheet.getId();
+  template.sheetName = sheet.getName()+".json";
   template.bucketName = props.bucketName || '';
   template.path = props.path || '';
   template.awsAccessKeyId = props.awsAccessKeyId || '';
@@ -87,16 +87,18 @@ function showConfig() {
 
 // update document configuration with values from form UI
 function updateConfig(form) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet();
+  //var sheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = SpreadsheetApp.getActiveSheet();
+
   PropertiesService.getDocumentProperties().setProperties({
     bucketName: form.bucketName,
     path: form.path,
     awsAccessKeyId: form.awsAccessKeyId,
-    awsSecretKey: form.awsSecretKey
+    awsSecretKey: form.awsSecretKey,
   });
   var message;
   if (hasRequiredProps()) {
-    message = 'Published spreadsheet will be accessible at: \nhttps://' + form.bucketName + '.s3.amazonaws.com/' + form.path + '/' + sheet.getId();
+    message = 'Published spreadsheet will be accessible at: \nhttps://' + form.bucketName + '.s3.amazonaws.com/' + form.path + '/' + sheet.getName();
     publish();
     // Create an onChange trigger programatically instead of manually because 
     // manual triggers disappear for no reason. See:
