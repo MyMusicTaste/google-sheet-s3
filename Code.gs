@@ -68,7 +68,7 @@ function publish(event) {
   // https://engetc.com/projects/amazon-s3-api-binding-for-google-apps-script/
   var props = PropertiesService.getDocumentProperties().getProperties();
   var s3 = S3.getInstance(props.awsAccessKeyId, props.awsSecretKey);
-  s3.putObject(props.bucketName, [props.path, sheet.getActiveSheet().getName().replace(" ","_")+".json"].join('/'), objs);
+  s3.putObject(props.bucketName, [props.path, sheet.getActiveSheet().getName().replace(" ","_")+".jsonl"].join('/'), objs);
 }
 
 // show the configuration modal dialog UI
@@ -77,7 +77,7 @@ function showConfig() {
   var ui = SpreadsheetApp.getUi();
   var props = PropertiesService.getDocumentProperties().getProperties();
   var template = HtmlService.createTemplateFromFile('config');
-  template.sheetName = sheet.getName()+".json";
+  template.sheetName = sheet.getName()+".jsonl";
   template.bucketName = props.bucketName || '';
   template.path = props.path || '';
   template.awsAccessKeyId = props.awsAccessKeyId || '';
