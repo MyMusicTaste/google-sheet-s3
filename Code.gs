@@ -49,7 +49,7 @@ function publish(event) {
   });
 
   // create an array of objects keyed by header
-  var objs = rows
+ /* var objs = rows
   .slice(1)
   .map(function(row){
     var obj = {};
@@ -63,7 +63,9 @@ function publish(event) {
     });
     return obj;
   });
-
+*/
+  var objs = rows.map(function(item){ return JSON.stringify(item) }).join(‘\n’)
+  
   // upload to S3`
   // https://engetc.com/projects/amazon-s3-api-binding-for-google-apps-script/
   var props = PropertiesService.getDocumentProperties().getProperties();
